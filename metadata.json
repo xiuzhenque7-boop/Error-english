@@ -1,0 +1,6 @@
+{
+  "name": "错题举一反三",
+  "description": "上传错题图片，系统将智能识别考点并自动生成3道相对应的举一反三相似练习题，支持保存在线错题本与重新生成题目。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
