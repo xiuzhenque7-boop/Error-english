@@ -54,7 +54,7 @@ const responseSchema = {
         },
         knowledgePoint: {
           type: Type.STRING,
-          description: "核心知识点/考点，例如：一元二次方程求根公式、动能定理、宾语从句",
+          description: "核心知识点/考点，例如：一元二次方程配方法于平方根运算性质、动能定理、宾语从句",
         },
         analysis: {
           type: Type.STRING,
@@ -104,8 +104,85 @@ const responseSchema = {
   required: ["subject", "grade", "originalQuestion", "similarQuestions"],
 };
 
-// Error generator backup when API key is missing or calls fail
+// Error generator backup when API key is missing or calls fail/limit-exceeded
 function getFallbackQuestions(subject: string = "数学", grade: string = "初中") {
+  if (subject === "物理" || subject === "科学") {
+    return {
+      subject: "物理",
+      grade: grade || "高中",
+      originalQuestion: {
+        content: "一质量为m的物体从 H = 5m 高处自由下落，落入沙坑 d = 0.2m 深处静止。求沙层阻力 f 是重力 mg 的几倍？",
+        knowledgePoint: "动能定理中物体重力功的全程性分析",
+        analysis: "在动能定理计算中，重力在下降的全程（包括空气中下降 H 以及沙坑中下落 d）都要做正功，忽略沙坑深度处的重力功是经典的易错点。全程方程应为：mg(H + d) - f_阻 * d = 0。"
+      },
+      similarQuestions: [
+        {
+          id: "sim_1",
+          type: "解答题",
+          content: "一质量为 1kg 的铁球从离地 H = 10m 的高处由静止下落，落入泥地中 d = 0.5m 后停止运动。如果不计空气阻力，求泥地对铁球的平均阻力 F_泥 大小（g取10m/s²）。",
+          options: [],
+          answer: "210 N",
+          analysis: "1. 设泥地平均阻力为 F_泥。整个下落过程中重力做功为 mg(H + d)，泥地阻力做功为 -F_泥 * d。\n2. 根据动能定理，有整个过程：W_总 = mg(H + d) - F_泥 * d = ΔEk = 0。\n3. 代入数据：(1kg)(10m/s²)(10m + 0.5m) - F_泥 * 0.5m = 0。\n4. 化简可得：105 N·m - 0.5 * F_泥 = 0，从而解得泥地阻力 F_泥 = 210 N。"
+        },
+        {
+          id: "sim_2",
+          type: "选择题",
+          content: "一个质量为 m 的小球，从距水面高 h 处的 A 点自由下落，落入水中下沉深 H 处 B 点时速度减为零。不计空气阻力，求水对小球的平均浮力与阻力的合力 F。正确表达式是：\nA. F = mg(1 + h/H)\nB. F = mgh/H\nC. F = mg(1 - h/H)\nD. F = mg(1 + H/h)",
+          options: ["A. F = mg(1 + h/H)", "B. F = mgh/H", "C. F = mg(1 - h/H)", "D. F = mg(1 + H/h)"],
+          answer: "A",
+          analysis: "1. 同样适用全程法：小球自静止下落到水中速度为零的过程，重力做功为 mg(h + H)。\n2. 浮力与阻力的合力 F 对小球做负功，在水中下潜深度为 H，则功为 -F * H。\n3. 根据动能定理：mg(h + H) - F * H = 0。\n4. 整理方程：F * H = mg(h + H) ➔ F = mg(1 + h/H)。因此正确选项是 A。"
+        },
+        {
+          id: "sim_3",
+          type: "填空题",
+          content: "一个质量为 m 的雨滴，从海拔 h = 200m 高空的云层由静止自由飘落。由于空气阻力的存在，当落到距离地面 d = 5m 后已经达到了恒定的终极速度 v = 5m/s 并匀速下落直到落地。求空气阻力在雨滴下落全程做的总功 W_阻 表达式为 ___________。",
+          options: [],
+          answer: "0.5mv² - mgh",
+          analysis: "1. 雨滴自由下落的全程重力做正功，下落总高度为 h，重力功为 mgh。\n2. 全程空气阻力做功设为 W_阻。\n3. 根据动能定理：W_重 + W_阻 = Ek_末 - Ek_初 ➔ mgh + W_阻 = 0.5mv² - 0。\n4. 移项可得空气阻力做的功 W_阻 = 0.5mv² - mgh。"
+        }
+      ]
+    };
+  }
+
+  if (subject === "英语" || subject === "外语") {
+    return {
+      subject: "英语",
+      grade: grade || "初中",
+      originalQuestion: {
+        content: "将“我想知道他住在哪里”翻译成英文。\n学生错写：I want to know where does he live.",
+        knowledgePoint: "宾语从句中的陈述句排布语序",
+        analysis: "宾语从句在主句中作宾语时，即使引导词是 where/what/how 等特殊疑问词，从句中词序也必须使用“主语+谓语”的陈述语序，严禁套用疑问句的助动词倒装结构形式。"
+      },
+      similarQuestions: [
+        {
+          id: "sim_1",
+          type: "解答题",
+          content: "请将“你能告诉我你为什么迟到了吗？”翻译为英文。",
+          options: [],
+          answer: "Can you tell me why you are late? (或 Can you tell me why you were late?)",
+          analysis: "1. 疑问主句是 Can you tell me... 后面要接疑问原因。 \n2. 宾语从句是“你为什么迟到了”，引导词是 why。语序必须是陈述句语序，所以是 'why you are/were late' 而不是倒装的 'why are/were you late'。\n3. 结合起来即为：Can you tell me why you are late?"
+        },
+        {
+          id: "sim_2",
+          type: "选择题",
+          content: "— Excuse me, could you tell me ______?\n— Certainly. In about ten minutes.\nA. when will the train leave\nB. when the train will leave\nC. when does the train leave\nD. when the train left",
+          options: ["A. when will the train leave", "B. when the train will leave", "C. when does the train leave", "D. when the train left"],
+          answer: "B",
+          analysis: "1. “could you tell me” 后面接宾语从句，从句必须采用“陈述语序”，即主语在前、谓语在后。由此可以排除 A、C（这两个依然是特殊疑问句的倒装语序）。\n2. 答语“In about ten minutes”意为“在约10分钟之后”，表明火车还没有开，指将来要发生的动作，需使用一般将来时。\n3. 因此，选择 B 选项。"
+        },
+        {
+          id: "sim_3",
+          type: "填空题",
+          content: "I wasn't sure _________ (谁写了这封信), so I didn't reply to it immediately.",
+          options: [],
+          answer: "who wrote this letter / who had written the letter",
+          analysis: "1. 空白处做 wasn't sure 的宾语从句。\n2. 应该用陈述语序，而疑问词 who 自主充当从句的主语，谓语动词 write 使用过去式形式 wrote 即可表示谁写了这封信。"
+        }
+      ]
+    };
+  }
+
+  // Default to Mathematics
   return {
     subject,
     grade,
@@ -162,14 +239,14 @@ app.post("/api/generate-questions", async (req, res) => {
       base64Data = parts[1];
       const mimeMatch = meta.match(/data:([^;]+);/);
       if (mimeMatch) {
-        mimeType = mimeMatch[1];
+         mimeType = mimeMatch[1];
       }
     }
 
     // Safety check check key
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-      console.warn("GEMINI_API_KEY not configured. Using high-quality offline fallbacks for immediate preview.");
+    if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey.trim() === "") {
+      console.warn("GEMINI_API_KEY not configured or using placeholders. Using high-quality offline fallbacks for immediate preview.");
       // Provide custom mock data based on subject filter if provided
       return res.json(getFallbackQuestions(subject || "数学", grade || "初中"));
     }
@@ -221,8 +298,25 @@ app.post("/api/generate-questions", async (req, res) => {
       throw new Error("Gemini returned empty text response");
     }
 
-    const parsedJson = JSON.parse(textOutput.trim());
-    res.json(parsedJson);
+    // Clean Markdown block wrapper markings if present in string output
+    let cleanText = textOutput.trim();
+    if (cleanText.startsWith("```json")) {
+      cleanText = cleanText.substring(7);
+    } else if (cleanText.startsWith("```")) {
+      cleanText = cleanText.substring(3);
+    }
+    if (cleanText.endsWith("```")) {
+      cleanText = cleanText.substring(0, cleanText.length - 3);
+    }
+    cleanText = cleanText.trim();
+
+    try {
+      const parsedJson = JSON.parse(cleanText);
+      res.json(parsedJson);
+    } catch (err: any) {
+      console.error("JSON parsing error on cleaned response:", cleanText, err);
+      throw new Error(`无法解析模型返回的结构化JSON数据。内容为: ${cleanText.substring(0, 200)}...`);
+    }
 
   } catch (error: any) {
     console.error("Error analyzing image and generating questions:", error);

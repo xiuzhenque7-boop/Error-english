@@ -208,7 +208,14 @@ export default function App() {
       });
 
       if (!response.ok) {
-        throw new Error(`服务生成失败，状态码: ${response.status}`);
+        let errStr = `服务生成失败，状态码: ${response.status}`;
+        try {
+          const errPayload = await response.json();
+          if (errPayload && (errPayload.error || errPayload.details)) {
+            errStr = `${errPayload.error || "生成错误"} - ${errPayload.details || ""}`;
+          }
+        } catch (_) {}
+        throw new Error(errStr);
       }
 
       const data: AnalogyResult = await response.json();
