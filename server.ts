@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 
 dotenv.config();
@@ -331,6 +330,7 @@ app.post("/api/generate-questions", async (req, res) => {
 const startServer = async () => {
   if (process.env.NODE_ENV !== "production") {
     // Development Mode: Use Vite Dev Server Middleware
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
