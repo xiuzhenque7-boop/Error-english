@@ -345,11 +345,17 @@ const startServer = async () => {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[Full-Stack Server] running on http://localhost:${PORT}`);
-  });
+  if (process.env.VERCEL !== "1") {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`[Full-Stack Server] running on http://localhost:${PORT}`);
+    });
+  }
 };
 
-startServer().catch((err) => {
-  console.error("Failed to start full-stack server:", err);
-});
+if (process.env.VERCEL !== "1") {
+  startServer().catch((err) => {
+    console.error("Failed to start full-stack server:", err);
+  });
+}
+
+export default app;

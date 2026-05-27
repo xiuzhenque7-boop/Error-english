@@ -212,9 +212,20 @@ export default function App() {
         try {
           const errPayload = await response.json();
           if (errPayload && (errPayload.error || errPayload.details)) {
-            errStr = `${errPayload.error || "生成错误"} - ${errPayload.details || ""}`;
+            const errorMsgPart = errPayload.error || "生成错误";
+            const detailsPart = errPayload.details || "";
+            errStr = `${errorMsgPart} - ${detailsPart}`;
+
+            // Add extra friendly guides for Vercel deployment and API key issues
+            if (detailsPart.includes("GEMINI_API_KEY") || errorMsgPart.includes("GEMINI_API_KEY") || detailsPart.includes("key is required")) {
+              errStr += "\n\n【API KEY 部署提示】\n未检测到有效的 GEMINI_API_KEY 环境变量。请登录 Vercel 控制台，进入您的项目设置 (Settings -> Environment Variables) 页面，添加一个名为「GEMINI_API_KEY」的环境变量，其值填入您的 Google AI Studio API Key (形式如 AIzaSy...)。保存后请点击 \"Redeploy\" 重新部署该项目即可。";
+            }
           }
-        } catch (_) {}
+        } catch (_) {
+          if (response.status === 404) {
+            errStr = `未找到 API 处理接口 (404)。\n\n【部署提示】\n如果您是在 Vercel 部署，请确保您的项目根目录下存在「vercel.json」配置文件以及「/api/index.ts」文件以支持服务器无缝映射处理。如果是用 Vite 原生构建，由于 Vercel 默认不会单独挂载和启动 node 后端服务，建议查看我们的文档说明。`;
+          }
+        }
         throw new Error(errStr);
       }
 
@@ -714,7 +725,7 @@ export default function App() {
                     <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                     <div className="space-y-1">
                       <h4 className="text-sm font-bold text-red-800">智能分析遇到些许故障</h4>
-                      <p className="text-xs text-red-700 leading-relaxed">{errorMsg}</p>
+                      <p className="text-xs text-red-700 leading-relaxed whitespace-pre-line">{errorMsg}</p>
                     </div>
                   </div>
                   <div className="pt-2">
